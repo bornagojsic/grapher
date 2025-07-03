@@ -5,36 +5,34 @@ interface ListSelectionProps {
     list: Array<any>;
     onSelect: (graph: any) => void;
     onDelete: (graph: any) => void;
-    children?: React.ReactNode;
+    emptyMessage?: React.ReactNode;
 }
 
 export default function ListSelection({
     list,
     onSelect,
     onDelete,
-    children,
+    emptyMessage,
 }: ListSelectionProps) {
+    if (!list || !Array.isArray(list) || list.length === 0) {
+        return emptyMessage;
+    }
+
     return (
-        <>
-            {list.length > 0 ? (
-                <ScrollArea className="w-full h-fit max-h-[200px] rounded-md border overflow-y-auto p-2.5">
-                    {list.map((graph) => (
-                        <ListSelectionItem
-                            key={graph.id}
-                            active={graph.active}
-                            title={graph.name}
-                            onClick={() => {
-                                onSelect(graph);
-                            }}
-                            onDelete={() => {
-                                onDelete(graph);
-                            }}
-                        />
-                    ))}
-                </ScrollArea>
-            ) : (
-                { children }
-            )}
-        </>
+        <ScrollArea className="w-full h-fit max-h-[400px] rounded-md border overflow-y-auto p-2.5">
+            {list.map((item) => (
+                <ListSelectionItem
+                    key={item.id}
+                    active={item.active}
+                    title={item.name}
+                    onClick={() => {
+                        onSelect(item);
+                    }}
+                    onDelete={() => {
+                        onDelete(item);
+                    }}
+                />
+            ))}
+        </ScrollArea>
     );
 }

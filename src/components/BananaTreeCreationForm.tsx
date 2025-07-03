@@ -73,6 +73,13 @@ export default function BananaTreeCreationForm({
             active: false,
             ...createBananaTree(values.n, values.k),
         });
+
+        form.reset();
+
+        const closeButton = document.getElementsByClassName(
+            "ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+        )[0] as HTMLElement | undefined;
+        closeButton?.click();
     }
 
     return (
@@ -131,7 +138,7 @@ export default function BananaTreeCreationForm({
                         </FormItem>
                     )}
                 />
-                <Button variant="outline" type="submit">
+                <Button variant="outline" type="submit" className="mt-2">
                     Add graph
                 </Button>
             </form>
