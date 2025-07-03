@@ -4,11 +4,12 @@ import {
     ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import ForceGraph from "@/components/ForceGraph";
-import { BananaTreeSelectionForm } from "./GraphSelectionForm";
+import { GraphSelectionForm } from "./GraphSelectionForm";
 import React from "react";
 import createBananaTree from "@/utils/banana-tree";
 import CollapsibleCard from "./ui/collapsible-card";
 import type { GraphListItem } from "@/components/GraphSelectionForm";
+import LabelingSelectionForm from "./LableingSelectionForm";
 
 export function ResizableGraphInterface() {
     const sampleGraph: GraphListItem = {
@@ -68,7 +69,7 @@ export function ResizableGraphInterface() {
             <ResizablePanel defaultSize={25} minSize={18}>
                 <div className="flex flex-col h-[calc(100vh-90px-2rem)]">
                     <CollapsibleCard title="Select a graph">
-                        <BananaTreeSelectionForm
+                        <GraphSelectionForm
                             currentGraphsList={graphsList}
                             selectGraph={selectGraph}
                             addGraph={addGraph}
@@ -76,9 +77,7 @@ export function ResizableGraphInterface() {
                         />
                     </CollapsibleCard>
                     <CollapsibleCard title="Select a labeling">
-                        <div className="flex flex-col items-center justify-center h-full p-4">
-                            TODO: Add labeling options here
-                        </div>
+                        <LabelingSelectionForm />
                     </CollapsibleCard>
                 </div>
             </ResizablePanel>
