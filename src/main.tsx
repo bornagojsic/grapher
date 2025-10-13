@@ -5,7 +5,7 @@ import App from "./App.tsx";
 import "katex/dist/katex.min.css";
 
 createRoot(document.getElementById("root")!).render(
-    <StrictMode>
-        <App />
-    </StrictMode>
+  <StrictMode>
+    <App />
+  </StrictMode>,
 );
