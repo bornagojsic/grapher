@@ -1,5 +1,6 @@
 runner-test:
-  tags: []
+  tags:
+    - deploy
   script:
     - echo "User = $(whoami)"
     - echo "Home = $HOME"
