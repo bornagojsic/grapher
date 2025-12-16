@@ -1,7 +1,5 @@
 runner-test:
-  tags: []   # remove if you use tags
+  tags: []
   script:
     - echo "User: $(whoami)"
     - echo "Home: $HOME"
-    - pwd
-    - env | sort | head -n 10
