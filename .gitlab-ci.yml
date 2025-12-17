@@ -1,6 +1,8 @@
+stages:
+  - test
+
 runner-test:
-  tags:
-    - deploy
+  stage: test
   script:
     - echo "User = $(whoami)"
     - echo "Home = $HOME"
