@@ -12,6 +12,7 @@ deploy_to_server:
     PROJECT_NAME: $CI_PROJECT_NAME  # GitLab auto-provides this
     STACK_DIR: "/opt/stacks/$CI_PROJECT_NAME"
     SERVICE_DIR: "/home/server/active-services/$CI_PROJECT_NAME"
+    DOCKER_HOST: unix:///var/run/docker.sock
   before_script:
     - echo "DOCKER_HOST=$DOCKER_HOST"
     - |
