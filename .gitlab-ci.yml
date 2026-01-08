@@ -40,6 +40,8 @@ deploy_to_server:
       networks: {}
       EOF
 
+    - cat "$STACK_DIR/docker-compose.yml" 
+
     # Deploy (build + run in background)
     - cd "$STACK_DIR" && docker compose up -d --build
 
