@@ -1,8 +1,48 @@
+# .gitlab-ci.yml
 stages:
-  - test
+  - deploy
 
-runner-test:
-  stage: test
+deploy_to_server:
+  tags:
+    - shell
+  stage: deploy
+  only:
+    - main
+  variables:
+    PROJECT_NAME: $CI_PROJECT_NAME  # GitLab auto-provides this
+    STACK_DIR: "/opt/stacks/$CI_PROJECT_NAME"
+    SERVICE_DIR: "/home/server/active-services/$CI_PROJECT_NAME"
+  before_script:
+    - |
+      if [ -d "$STACK_DIR" ]; then
+        cd "$STACK_DIR" && docker compose down
+      fi
+    - mkdir -p "$STACK_DIR" "$SERVICE_DIR"
+    - git config --global --add safe.directory "$SERVICE_DIR"
   script:
-    - echo "User = $(whoami)"
-    - echo "Home = $HOME"
+    # Clone or update the repo in active-services
+    - |
+      if [ -d "$SERVICE_DIR/.git" ]; then
+        rm -rf "$SERVICE_DIR"
+      fi && git clone --branch main git@ssh.gitlab.bornagojsic.dev:bornagojsic/$CI_PROJECT_NAME.git "$SERVICE_DIR"
+
+    # Generate docker-compose.yml
+    - |
+      cat > "$STACK_DIR/docker-compose.yml" <<EOF
+      services:
+        $CI_PROJECT_NAME:
+          build:
+            context: $SERVICE_DIR
+            dockerfile: Dockerfile
+          ports:
+            - "$DEPLOY_PORT:$DEPLOY_PORT"
+          restart: unless-stopped
+      networks: {}
+      EOF
+
+    # Deploy (build + run in background)
+    - cd "$STACK_DIR" && docker compose up -d --build
+
+  # Optional: cleanup dangling images
+  after_script:
+    - docker image prune -f
