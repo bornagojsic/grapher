@@ -57,9 +57,7 @@ export function GraphSelectionForm({
             removeGraph?.(graph);
           }}
           emptyMessage={
-            <span className="text-sm text-muted-foreground">
-              (no current graphs)
-            </span>
+            <span className="text-sm text-muted-foreground">(no graphs)</span>
           }
         />
 
