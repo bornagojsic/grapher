@@ -13,6 +13,7 @@ deploy_to_server:
     STACK_DIR: "/opt/stacks/$CI_PROJECT_NAME"
     SERVICE_DIR: "/home/server/active-services/$CI_PROJECT_NAME"
   before_script:
+    - echo "DOCKER_HOST=$DOCKER_HOST"
     - |
       if [ -d "$STACK_DIR" ]; then
         cd "$STACK_DIR" && docker compose down
