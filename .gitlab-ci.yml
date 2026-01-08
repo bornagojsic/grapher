@@ -21,6 +21,9 @@ deploy_to_server:
     - git config --global --add safe.directory "$SERVICE_DIR"
   script:
     # Clone or update the repo in active-services
+    - echo "$STACK_DIR"
+    - echo "$SERVICE_DIR" 
+
     - |
       if [ -d "$SERVICE_DIR/.git" ]; then
         rm -rf "$SERVICE_DIR"
