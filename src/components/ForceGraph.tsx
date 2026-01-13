@@ -9,6 +9,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu";
 import NodeEditForm from "./NodeEditForm";
 import { useTheme } from "./theme-provider";
 
@@ -217,47 +224,52 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
   }, [currentNodes, currentLinks, width, height, defaultColor]);
 
   return (
-    <>
-      <svg
-        ref={svgRef}
-        width={width}
-        height={height}
-        className="force-graph"
-        style={{ cursor: "move" }}
-      />
-      {contextNode && (
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Node Settings</DialogTitle>
-              <DialogDescription>
-                Customize the appearance of the selected node.
-              </DialogDescription>
-              {/*<div>
-                Context node: {contextNode.id}
-                <br />
-                Color: {contextNode.color ?? "default"}
-              </div>*/}
-              <NodeEditForm
-                defaultValues={{
-                  name: contextNode.label,
-                  color: contextNode.color ?? defaultColor,
-                }}
-                alreadyUsedNames={nodes.map((node) => node.label)}
-                onSave={(updates) => {
-                  onUpdateNode(contextNode.id, updates);
-                  setDialogOpen(false);
-                }}
-                onDelete={() => {
-                  onDeleteNode(contextNode.id);
-                  setDialogOpen(false);
-                }}
-              />
-            </DialogHeader>
-          </DialogContent>
-        </Dialog>
-      )}
-    </>
+    <ContextMenu>
+      <ContextMenuTrigger className="w-full h-full">
+        <svg
+          ref={svgRef}
+          width={width}
+          height={height}
+          className="force-graph"
+          style={{ cursor: "move" }}
+        />
+        {contextNode && (
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Node Settings</DialogTitle>
+                <DialogDescription>
+                  Customize the appearance of the selected node.
+                </DialogDescription>
+                <NodeEditForm
+                  defaultValues={{
+                    name: contextNode.label,
+                    color: contextNode.color ?? defaultColor,
+                  }}
+                  alreadyUsedNames={nodes.map((node) => node.label)}
+                  onSave={(updates) => {
+                    onUpdateNode(contextNode.id, updates);
+                    setDialogOpen(false);
+                  }}
+                  onDelete={() => {
+                    onDeleteNode(contextNode.id);
+                    setDialogOpen(false);
+                  }}
+                />
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+        )}
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem disabled>Save Graph</ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
+        <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>
+        <ContextMenuItem disabled>Show Domineering Sets</ContextMenuItem>
+        <ContextMenuItem disabled>Show Independent Sets</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
 
