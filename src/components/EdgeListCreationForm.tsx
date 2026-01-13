@@ -7,8 +7,9 @@ import { Textarea } from "./ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import { useTheme } from "@/components/theme-provider";
 
-export const formSchema = z.object({
+const formSchema = z.object({
   name: z
     .string()
     .min(1, {
@@ -38,6 +39,9 @@ export default function EdgeListCreationForm({
 }: {
   addGraph?: (graph: GraphListItem) => void;
 }) {
+  const theme = useTheme();
+  const defaultColor = theme.theme === "light" ? "#2B7FFF" : "#155DFC";
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -59,6 +63,7 @@ export default function EdgeListCreationForm({
       id: name,
       name: name,
       label: name,
+      color: defaultColor,
     }));
 
     const edges = edgeList.split(";").map((edge) => {

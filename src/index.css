@@ -173,7 +173,7 @@ html.light g {
     stroke: #222;
 }
 
-circle {
+circle.default-color {
     fill: var(--primary);
 }
 

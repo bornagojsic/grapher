@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import type { GraphListItem } from "./GraphSelectionForm";
 import { Button } from "./ui/button";
+import { useTheme } from "@/components/theme-provider";
 
 export const formSchema = z.object({
   name: z
@@ -55,6 +56,9 @@ export default function BananaTreeCreationForm({
   defaultValues,
   addGraph,
 }: BananaTreeCreationFormProps) {
+  const theme = useTheme();
+  const defaultColor = theme.theme === "light" ? "#2B7FFF" : "#155DFC";
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues || {
@@ -71,7 +75,7 @@ export default function BananaTreeCreationForm({
       name: values.name,
       description: `Banana tree with n = ${values.n} and k = ${values.k}.`,
       active: false,
-      ...createBananaTree(values.n, values.k),
+      ...createBananaTree(values.n, values.k, defaultColor),
     });
 
     form.reset();

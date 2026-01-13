@@ -1,10 +1,21 @@
 // components/ForceGraph.tsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import katex from "katex";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import NodeEditForm from "./NodeEditForm";
+import { useTheme } from "./theme-provider";
 
 export interface GraphNode {
   id: string;
+  label: string;
+  color: string;
   x?: number;
   y?: number;
   fx?: number | null;
@@ -23,6 +34,8 @@ interface ForceGraphProps {
   links: GraphLink[];
   width?: number;
   height?: number;
+  onUpdateNode: (id: string, updates: Partial<GraphNode>) => void;
+  onDeleteNode: (id: string) => void;
 }
 
 const ForceGraph: React.FC<ForceGraphProps> = ({
@@ -30,15 +43,43 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
   links,
   width = 800,
   height = 600,
+  onUpdateNode,
+  onDeleteNode,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+
+  const [contextNode, setContextNode] = useState<GraphNode | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const theme = useTheme();
+  const defaultColor = theme.theme === "light" ? "#2B7FFF" : "#155DFC";
+
+  const [currentNodes, setNodes] = useState<GraphNode[]>(nodes);
+  const [currentLinks, setLinks] = useState<GraphLink[]>(links);
+
+  // const deleteLink = (source: string, target: string) => {
+  //   setLinks((prev) =>
+  //     prev.filter((l) => l.source !== source && l.target !== target),
+  //   );
+  // };
+
+  useEffect(() => {
+    setNodes(nodes);
+    setLinks(links);
+  }, [nodes, links]);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const simulationNodes = nodes.map((n) => ({ ...n }));
-    const simulationLinks = links.map((l) => ({ ...l }));
+    const simulationNodes = currentNodes.map((n) => ({ ...n }));
+    const simulationLinks = currentLinks.map((l) => ({ ...l }));
+
+    const showContextMenu = (event: MouseEvent, d: GraphNode) => {
+      event.preventDefault();
+      setContextNode(d);
+      setDialogOpen(true);
+    };
 
     const simulation = d3
       .forceSimulation(simulationNodes)
@@ -71,7 +112,8 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .data(simulationNodes)
       .join("circle")
       .attr("r", 25)
-      .attr("fill", "steelblue")
+      .attr("fill", (d) => d.color ?? defaultColor)
+      .attr("class", (d) => (d.color ? "" : "default-color"))
       .style("cursor", "move") // default hover cursor
       .on("mouseover", function () {
         d3.select(this).style("cursor", "grab"); // on hover
@@ -79,7 +121,10 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .on("mouseout", function () {
         d3.select(this).style("cursor", "move"); // back to default
       })
-      .call(drag(simulation) as any);
+      .call(drag(simulation) as any)
+      .on("contextmenu", function (event: MouseEvent, d: GraphNode) {
+        showContextMenu(event, d); //, this);
+      });
 
     g.append("g")
       .attr("class", "latex-labels")
@@ -95,7 +140,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .style("text-align", "center")
       .each(function (d) {
         try {
-          katex.render(d.id || "", this as HTMLElement, {
+          katex.render(d.label, this as HTMLElement, {
             throwOnError: false,
             displayMode: true,
           });
@@ -105,7 +150,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       })
       .call(drag(simulation) as any);
 
-    node.append("title").text((d) => d.id);
+    node.append("title").text((d) => d.label);
 
     simulation.on("tick", () => {
       link
@@ -169,16 +214,50 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
         .on("drag", dragged)
         .on("end", dragended);
     }
-  }, [nodes, links, width, height]);
+  }, [currentNodes, currentLinks, width, height, defaultColor]);
 
   return (
-    <svg
-      ref={svgRef}
-      width={width}
-      height={height}
-      className="force-graph"
-      style={{ cursor: "move" }}
-    />
+    <>
+      <svg
+        ref={svgRef}
+        width={width}
+        height={height}
+        className="force-graph"
+        style={{ cursor: "move" }}
+      />
+      {contextNode && (
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Node Settings</DialogTitle>
+              <DialogDescription>
+                Customize the appearance of the selected node.
+              </DialogDescription>
+              {/*<div>
+                Context node: {contextNode.id}
+                <br />
+                Color: {contextNode.color ?? "default"}
+              </div>*/}
+              <NodeEditForm
+                defaultValues={{
+                  name: contextNode.label,
+                  color: contextNode.color ?? defaultColor,
+                }}
+                alreadyUsedNames={nodes.map((node) => node.label)}
+                onSave={(updates) => {
+                  onUpdateNode(contextNode.id, updates);
+                  setDialogOpen(false);
+                }}
+                onDelete={() => {
+                  onDeleteNode(contextNode.id);
+                  setDialogOpen(false);
+                }}
+              />
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 };
 

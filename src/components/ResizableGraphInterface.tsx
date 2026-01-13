@@ -9,15 +9,20 @@ import createBananaTree from "@/utils/banana-tree";
 import React from "react";
 import { GraphSelectionForm } from "./GraphSelectionForm";
 import { ScrollArea } from "./ui/scroll-area";
+import { useTheme } from "@/components/theme-provider";
+import type { GraphNode } from "@/components/ForceGraph";
 
 export function ResizableGraphInterface() {
+  const theme = useTheme();
+  const defaultColor = theme.theme === "light" ? "#2B7FFF" : "#155DFC";
+
   let defaultGraphsList: GraphListItem[] = [
     {
       id: "sample-graph",
       name: "B(3, 2)",
       description: "Sample Banana Tree Graph with n=3, k=2",
       active: true,
-      ...createBananaTree(3, 2),
+      ...createBananaTree(3, 2, defaultColor),
     },
   ];
 
@@ -44,12 +49,51 @@ export function ResizableGraphInterface() {
       (graph) => graph.id === lastActiveGraphId,
     );
     if (lastActiveGraph) {
+      // TODO: maybe add something
     } else {
       console.warn(
         `Last active graph with id ${lastActiveGraphId} not found in the default graphs list.`,
       );
     }
   }
+
+  const updateActiveGraph = (
+    updater: (graph: GraphListItem) => GraphListItem,
+  ) => {
+    setGraphsList((prev) => {
+      const updated = prev.map((graph) => {
+        if (graph.id !== activeGraph.id) return graph;
+        return updater(graph);
+      });
+
+      localStorage.setItem("graphsList", JSON.stringify(updated));
+      return updated;
+    });
+
+    setActiveGraph((prev) => updater(prev));
+  };
+
+  const updateNodeInActiveGraph = (
+    nodeId: string,
+    updates: Partial<GraphNode>,
+  ) => {
+    updateActiveGraph((graph) => ({
+      ...graph,
+      nodes: graph.nodes.map((n) =>
+        n.id === nodeId ? { ...n, ...updates } : n,
+      ),
+    }));
+  };
+
+  const removeNodeFromActiveGraph = (nodeId: string) => {
+    updateActiveGraph((graph) => ({
+      ...graph,
+      nodes: graph.nodes.filter((n) => n.id !== nodeId),
+      links: graph.links.filter(
+        (l) => l.source !== nodeId && l.target !== nodeId,
+      ),
+    }));
+  };
 
   const updateLocalStorageGraphs = (graphs: GraphListItem[]) => {
     localStorage.setItem("graphsList", JSON.stringify(graphs));
@@ -65,9 +109,14 @@ export function ResizableGraphInterface() {
     React.useState<GraphListItem>(defaultActiveGraph);
 
   const selectGraph = (graph: GraphListItem) => {
-    activeGraph.active = false;
-    graph.active = true;
-    setActiveGraph(graph);
+    setGraphsList((prev) =>
+      prev.map((g) => ({
+        ...g,
+        active: g.id === graph.id,
+      })),
+    );
+
+    setActiveGraph({ ...graph, active: true });
     updateActiveGraphInLocalStorage(graph);
   };
 
@@ -113,7 +162,12 @@ export function ResizableGraphInterface() {
     >
       <ResizablePanel defaultSize={75} minSize={65}>
         <div className="flex h-[calc(100vh-90px-2rem)] items-center justify-center">
-          <ForceGraph nodes={activeGraph.nodes} links={activeGraph.links} />
+          <ForceGraph
+            nodes={activeGraph.nodes}
+            links={activeGraph.links}
+            onUpdateNode={updateNodeInActiveGraph}
+            onDeleteNode={removeNodeFromActiveGraph}
+          />
         </div>
       </ResizablePanel>
       <ResizableHandle withHandle />
