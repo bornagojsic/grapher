@@ -18,20 +18,17 @@ export const formSchema = z.object({
       message: "Name must be at most 25 characters long.",
     }),
   edgeList: z.string().refine(
-    (val) => {
+    (val: string) => {
       // Validate edge list format: "1-2;2-3;3-4"
       const edges = val.split(";");
       return edges.every((edge) => {
         const parts = edge.split("-");
-        return (
-          parts.length === 2 &&
-          !isNaN(Number(parts[0])) &&
-          !isNaN(Number(parts[1]))
-        );
+        return parts.length === 2;
       });
     },
     {
-      message: "Edge list must be in the format '1-2;2-3;3-4'",
+      message:
+        "Edge list must be in the format 'node_1-node_2;node_2-node_3;node_3-node_4'",
     },
   ),
 });
