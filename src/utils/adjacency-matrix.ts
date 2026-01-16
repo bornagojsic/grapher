@@ -1,5 +1,5 @@
 import parseEdgeList from "@/utils/edge-list";
-import type { GraphListItem } from "@/components/GraphSelectionForm";
+import type { GraphListItem } from "@/types/graph";
 
 export default function parseAdjacencyMatrix(
   adjacencyMatrix: string,

@@ -1,8 +1,8 @@
 import "./App.css";
 import React from "react";
-import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/mode-toggle";
-import { ResizableGraphInterface } from "./components/ResizableGraphInterface";
+import { ThemeProvider } from "@/components/theme/theme-provider";
+import { ModeToggle } from "@/components/theme/mode-toggle";
+import { ResizableGraphInterface } from "./components/graph/ResizableGraphInterface";
 
 const App: React.FC = () => {
   return (
