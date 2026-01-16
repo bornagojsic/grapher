@@ -27,13 +27,13 @@ export interface GraphNode {
   y?: number;
   fx?: number | null;
   fy?: number | null;
-  [key: string]: any;
+  //[key: string]: string;
 }
 
 export interface GraphLink {
   source: string;
   target: string;
-  [key: string]: any;
+  [key: string]: string;
 }
 
 interface ForceGraphProps {
@@ -96,7 +96,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
         "link",
         d3
           .forceLink(simulationLinks)
-          .id((d: any) => d.id)
+          .id((d: any) => d.id) // eslint-disable-line @typescript-eslint/no-explicit-any
           .distance(100),
       )
       .force("charge", d3.forceManyBody().strength(-200))
@@ -130,7 +130,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .on("mouseout", function () {
         d3.select(this).style("cursor", "move"); // back to default
       })
-      .call(drag(simulation) as any)
+      .call(drag(simulation) as any) // eslint-disable-line @typescript-eslint/no-explicit-any
       .on("contextmenu", function (event: MouseEvent, d: GraphNode) {
         showContextMenu(event, d); //, this);
       });
@@ -157,7 +157,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
           console.error("KaTeX render error:", err);
         }
       })
-      .call(drag(simulation) as any);
+      .call(drag(simulation) as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     node.append("title").text((d) => d.label);
 

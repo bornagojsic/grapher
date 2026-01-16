@@ -16,7 +16,7 @@ import type { GraphListItem } from "./GraphSelectionForm";
 import { Button } from "./ui/button";
 import { useTheme } from "@/components/theme-provider";
 
-export const formSchema = z.object({
+const formSchema = z.object({
   name: z
     .string()
     .min(1, {
@@ -47,9 +47,15 @@ export const formSchema = z.object({
     }),
 });
 
+export type BananaTreeCreationProps = {
+  name: string;
+  n: number;
+  k: number;
+};
+
 interface BananaTreeCreationFormProps {
   defaultValues?: z.infer<typeof formSchema>;
-  addGraph?: (graph: GraphListItem) => void;
+  addGraph: (graph: GraphListItem) => void;
 }
 
 export default function BananaTreeCreationForm({

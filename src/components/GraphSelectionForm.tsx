@@ -1,11 +1,9 @@
 "use client";
 
-import { z } from "zod";
-
 import { Separator } from "@/components/ui/separator";
 import type { GraphLink, GraphNode } from "./ForceGraph";
 import ListSelection from "./ListSelection";
-import { formSchema } from "./BananaTreeCreationForm";
+import type { BananaTreeCreationProps } from "./BananaTreeCreationForm";
 import AddGraphDialog from "./AddGraphDialog";
 
 export type GraphListItem = {
@@ -22,7 +20,7 @@ interface GraphSelectionFormProps {
   selectGraph?: (graph: GraphListItem) => void;
   addGraph: (graph: GraphListItem) => void;
   removeGraph?: (graph: GraphListItem) => void;
-  defaultValues?: z.infer<typeof formSchema>;
+  defaultValues?: BananaTreeCreationProps;
 }
 
 export function GraphSelectionForm({
@@ -54,18 +52,7 @@ export function GraphSelectionForm({
 
         <Separator className="m-4" />
 
-        <AddGraphDialog
-          defaultValues={
-            defaultValues
-              ? defaultValues
-              : {
-                  name: "",
-                  n: 3,
-                  k: 2,
-                }
-          }
-          addGraph={addGraph}
-        />
+        <AddGraphDialog defaultValues={defaultValues} addGraph={addGraph} />
       </div>
     </div>
   );

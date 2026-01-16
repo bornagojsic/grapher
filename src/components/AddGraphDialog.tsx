@@ -1,4 +1,3 @@
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import type { GraphListItem } from "./GraphSelectionForm";
 import {
@@ -9,7 +8,8 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import BananaTreeCreationForm, { formSchema } from "./BananaTreeCreationForm";
+import BananaTreeCreationForm from "./BananaTreeCreationForm";
+import type { BananaTreeCreationProps } from "./BananaTreeCreationForm";
 import EdgeListCreationForm from "./EdgeListCreationForm";
 import AdjacencyMatrixCreationForm from "./AdjacencyMatrixCreationForm";
 
@@ -18,7 +18,7 @@ export default function AddGraphDialog({
   defaultValues,
 }: {
   addGraph: (graph: GraphListItem) => void;
-  defaultValues: z.infer<typeof formSchema>;
+  defaultValues?: BananaTreeCreationProps;
 }) {
   return (
     <Dialog>
