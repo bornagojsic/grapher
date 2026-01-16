@@ -1,37 +1,24 @@
-function createAdjacencyMatrix(
-  nodes: { id: string }[],
-  links: { source: string; target: string }[],
-) {
-  const matrix: number[][] = Array.from({ length: nodes.length }, () =>
-    Array(nodes.length).fill(0),
-  );
+import parseEdgeList from "@/utils/edge-list";
+import type { GraphListItem } from "@/components/GraphSelectionForm";
 
-  links.forEach((link) => {
-    const sourceIndex = nodes.findIndex((node) => node.id === link.source);
-    const targetIndex = nodes.findIndex((node) => node.id === link.target);
-    if (sourceIndex !== -1 && targetIndex !== -1) {
-      matrix[sourceIndex][targetIndex] = 1;
-    }
-  });
+export default function parseAdjacencyMatrix(
+  adjacencyMatrix: string,
+  defaultColor: string,
+): GraphListItem {
+  const rows = adjacencyMatrix.split("\n");
 
-  return matrix;
-}
+  let edgeList = "";
 
-function createGraphFromAdjacencyMatrix(
-  matrix: number[][],
-  nodes: { id: string }[],
-) {
-  const links: { source: string; target: string }[] = [];
-
-  for (let i = 0; i < matrix.length; i++) {
-    for (let j = 0; j < matrix[i].length; j++) {
-      if (matrix[i][j] === 1) {
-        links.push({ source: nodes[i].id, target: nodes[j].id });
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i].split(" ");
+    for (let j = i + 1; j < row.length; j++) {
+      if (row[j] === "1") {
+        edgeList += `${i + 1}-${j + 1};`;
       }
     }
   }
 
-  return { nodes, links };
-}
+  edgeList = edgeList.slice(0, -1);
 
-export { createAdjacencyMatrix, createGraphFromAdjacencyMatrix };
+  return parseEdgeList(edgeList, defaultColor);
+}

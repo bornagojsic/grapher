@@ -62,7 +62,7 @@ export default function BananaTreeCreationForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues || {
-      name: "B(2, 1)",
+      name: "",
       n: 2,
       k: 1,
     },

@@ -43,6 +43,7 @@ interface ForceGraphProps {
   height?: number;
   onUpdateNode: (id: string, updates: Partial<GraphNode>) => void;
   onDeleteNode: (id: string) => void;
+  onSaveGraph: () => void;
 }
 
 const ForceGraph: React.FC<ForceGraphProps> = ({
@@ -52,6 +53,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
   height = 600,
   onUpdateNode,
   onDeleteNode,
+  onSaveGraph,
 }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -262,7 +264,9 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
         )}
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem disabled>Save Graph</ContextMenuItem>
+        <ContextMenuItem onClick={() => onSaveGraph()}>
+          Save Graph
+        </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
         <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>

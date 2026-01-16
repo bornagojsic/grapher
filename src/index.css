@@ -235,3 +235,7 @@ foreignObject {
 div[role="tabslist"] {
     padding: 0 !important;
 }
+
+.space-mono {
+    font-family: "Space Mono", monospace;
+}

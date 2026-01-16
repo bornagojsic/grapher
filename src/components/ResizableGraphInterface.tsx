@@ -95,6 +95,39 @@ export function ResizableGraphInterface() {
     }));
   };
 
+  const saveGraph = (graph: GraphListItem) => {
+    const graphToAdjacencyMatrix = (graph: GraphListItem) => {
+      const matrix = Array(graph.nodes.length)
+        .fill(0)
+        .map(() => Array(graph.nodes.length).fill(0));
+      graph.links.forEach((link) => {
+        const sourceIndex = graph.nodes.findIndex(
+          (node) => node.id === link.source,
+        );
+        const targetIndex = graph.nodes.findIndex(
+          (node) => node.id === link.target,
+        );
+        matrix[sourceIndex][targetIndex] = 1;
+        matrix[targetIndex][sourceIndex] = 1;
+      });
+      return matrix;
+    };
+
+    const matrix = graphToAdjacencyMatrix(graph);
+    const matrixString = matrix.map((row) => row.join(" ")).join("\n");
+    const blob = new Blob([matrixString], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${graph.name}.grp`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const saveActiveGraph = () => {
+    return saveGraph(activeGraph);
+  };
+
   const updateLocalStorageGraphs = (graphs: GraphListItem[]) => {
     localStorage.setItem("graphsList", JSON.stringify(graphs));
   };
@@ -167,6 +200,7 @@ export function ResizableGraphInterface() {
             links={activeGraph.links}
             onUpdateNode={updateNodeInActiveGraph}
             onDeleteNode={removeNodeFromActiveGraph}
+            onSaveGraph={saveActiveGraph}
           />
         </div>
       </ResizablePanel>
