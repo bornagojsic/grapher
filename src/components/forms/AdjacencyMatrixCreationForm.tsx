@@ -1,13 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import type { GraphListItem } from "./GraphSelectionForm";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { useTheme } from "@/components/theme-provider";
+import type { GraphListItem } from "@/types/graph";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useTheme } from "@/components/theme/theme-provider";
 import parseAdjacencyMatrix from "@/utils/adjacency-matrix";
 
 const formSchema = z.object({
@@ -54,8 +60,6 @@ export default function AdjacencyMatrixCreationForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-
     const graph = parseAdjacencyMatrix(values.adjacencyMatrix, defaultColor);
     graph.name = values.name;
 

@@ -1,4 +1,3 @@
-// components/ForceGraph.tsx
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import katex from "katex";
@@ -16,29 +15,13 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator,
 } from "@/components/ui/context-menu";
-import NodeEditForm from "./NodeEditForm";
-import { useTheme } from "./theme-provider";
-
-export interface GraphNode {
-  id: string;
-  label: string;
-  color: string;
-  x?: number;
-  y?: number;
-  fx?: number | null;
-  fy?: number | null;
-  //[key: string]: string;
-}
-
-export interface GraphLink {
-  source: string;
-  target: string;
-  [key: string]: string;
-}
+import NodeEditForm from "@/components/forms/NodeEditForm";
+import { useTheme } from "@/components/theme/theme-provider";
+import type { GraphNode } from "@/types/graph";
 
 interface ForceGraphProps {
   nodes: GraphNode[];
-  links: GraphLink[];
+  links: Array<{ source: string; target: string; [key: string]: string }>;
   width?: number;
   height?: number;
   onUpdateNode: (id: string, updates: Partial<GraphNode>) => void;
@@ -64,13 +47,9 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
   const defaultColor = theme.theme === "light" ? "#2B7FFF" : "#155DFC";
 
   const [currentNodes, setNodes] = useState<GraphNode[]>(nodes);
-  const [currentLinks, setLinks] = useState<GraphLink[]>(links);
-
-  // const deleteLink = (source: string, target: string) => {
-  //   setLinks((prev) =>
-  //     prev.filter((l) => l.source !== source && l.target !== target),
-  //   );
-  // };
+  const [currentLinks, setLinks] = useState<
+    Array<{ source: string; target: string; [key: string]: string }>
+  >(links);
 
   useEffect(() => {
     setNodes(nodes);
@@ -123,16 +102,16 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .attr("r", 25)
       .attr("fill", (d) => d.color ?? defaultColor)
       .attr("class", (d) => (d.color ? "" : "default-color"))
-      .style("cursor", "move") // default hover cursor
+      .style("cursor", "move")
       .on("mouseover", function () {
-        d3.select(this).style("cursor", "grab"); // on hover
+        d3.select(this).style("cursor", "grab");
       })
       .on("mouseout", function () {
-        d3.select(this).style("cursor", "move"); // back to default
+        d3.select(this).style("cursor", "move");
       })
       .call(drag(simulation) as any) // eslint-disable-line @typescript-eslint/no-explicit-any
       .on("contextmenu", function (event: MouseEvent, d: GraphNode) {
-        showContextMenu(event, d); //, this);
+        showContextMenu(event, d);
       });
 
     g.append("g")
@@ -170,10 +149,9 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
 
       node.attr("cx", (d) => d.x!).attr("cy", (d) => d.y!);
 
-      // label.attr("x", (d) => d.x!).attr("y", (d) => d.y! - 15); // keep aligned above node
       g.selectAll(".latex-labels foreignObject")
-        .attr("x", (d) => (d as GraphNode).x! - 50) // center horizontally
-        .attr("y", (d) => (d as GraphNode).y! - 25); // above the node
+        .attr("x", (d) => (d as GraphNode).x! - 50)
+        .attr("y", (d) => (d as GraphNode).y! - 25);
     });
 
     // Only pan when dragging the background (not on nodes)
@@ -182,7 +160,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
         d3
           .zoom<SVGSVGElement, unknown>()
           .filter((event) => {
-            return event.button === 0 && event.target === svgRef.current; // Only if clicked on background
+            return event.button === 0 && event.target === svgRef.current;
           })
           .on("zoom", (event) => {
             g.attr("transform", event.transform);
@@ -265,7 +243,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem onClick={() => onSaveGraph()}>
-          Save Graph
+          Download Graph
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>

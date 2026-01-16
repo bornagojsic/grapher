@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button";
-import type { GraphListItem } from "./GraphSelectionForm";
+import type { GraphListItem } from "@/types/graph";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BananaTreeCreationForm from "./BananaTreeCreationForm";
 import type { BananaTreeCreationProps } from "./BananaTreeCreationForm";
 import EdgeListCreationForm from "./EdgeListCreationForm";

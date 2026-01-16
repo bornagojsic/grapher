@@ -1,13 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import type { GraphListItem } from "./GraphSelectionForm";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "./ui/form";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { useTheme } from "@/components/theme-provider";
+import type { GraphListItem } from "@/types/graph";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useTheme } from "@/components/theme/theme-provider";
 import parseEdgeList from "@/utils/edge-list";
 
 const formSchema = z.object({
@@ -52,8 +58,6 @@ export default function EdgeListCreationForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-
     const graph = parseEdgeList(values.edgeList, defaultColor);
     graph.name = values.name;
 
@@ -91,7 +95,6 @@ export default function EdgeListCreationForm({
           name="edgeList"
           render={({ field }) => (
             <FormItem className="flex flex-row items-center space-x-2 flex-wrap justify-center">
-              {/* <FormLabel>Edge List:</FormLabel> */}
               <FormControl>
                 <Textarea
                   placeholder="1-2;2-3;3-4;4-5;5-1"

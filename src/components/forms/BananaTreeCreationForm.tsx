@@ -1,5 +1,5 @@
 import createBananaTree from "@/utils/banana-tree";
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -12,9 +12,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import type { GraphListItem } from "./GraphSelectionForm";
-import { Button } from "./ui/button";
-import { useTheme } from "@/components/theme-provider";
+import type { GraphListItem } from "@/types/graph";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/components/theme/theme-provider";
 
 const formSchema = z.object({
   name: z
@@ -75,7 +75,6 @@ export default function BananaTreeCreationForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
     addGraph?.({
       id: crypto.randomUUID(),
       name: values.name,

@@ -1,4 +1,4 @@
-import { Label } from "./ui/label";
+import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 interface NodeEditFormProps {
   defaultValues: { name: string; color: string };
@@ -52,8 +52,6 @@ export default function NodeEditForm({
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-
     onSave({
       label: values.name,
       color: values.color,

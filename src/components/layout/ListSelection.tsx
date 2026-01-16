@@ -1,5 +1,5 @@
 import ListSelectionItem from "./ListSelectionItem";
-import { ScrollArea } from "./ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ListSelectionProps {
   list: Array<any>;

@@ -1,19 +1,11 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import type { GraphLink, GraphNode } from "./ForceGraph";
-import ListSelection from "./ListSelection";
-import type { BananaTreeCreationProps } from "./BananaTreeCreationForm";
-import AddGraphDialog from "./AddGraphDialog";
-
-export type GraphListItem = {
-  id: string;
-  name: string;
-  description?: string;
-  nodes: Array<GraphNode>;
-  links: Array<GraphLink>;
-  active: boolean;
-};
+import type { GraphListItem } from "@/types/graph";
+import ListSelection from "@/components/layout/ListSelection";
+import type { BananaTreeCreationProps } from "@/components/forms/BananaTreeCreationForm";
+import AddGraphDialog from "@/components/forms/AddGraphDialog";
+import UploadGraphDialog from "@/components/forms/UploadGraphDialog";
 
 interface GraphSelectionFormProps {
   currentGraphsList?: Array<GraphListItem>;
@@ -52,7 +44,13 @@ export function GraphSelectionForm({
 
         <Separator className="m-4" />
 
-        <AddGraphDialog defaultValues={defaultValues} addGraph={addGraph} />
+        <div className="flex flex-col gap-2 w-full px-4">
+          <AddGraphDialog defaultValues={defaultValues} addGraph={addGraph} />
+          <UploadGraphDialog
+            addGraph={addGraph}
+            existingGraphIds={currentGraphsList?.map((g) => g.id) || []}
+          />
+        </div>
       </div>
     </div>
   );

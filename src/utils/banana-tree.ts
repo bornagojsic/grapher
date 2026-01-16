@@ -1,4 +1,4 @@
-import type { GraphLink, GraphNode } from "@/components/ForceGraph";
+import type { GraphLink, GraphNode } from "@/types/graph";
 
 export default function createBananaTree(
   n: number,

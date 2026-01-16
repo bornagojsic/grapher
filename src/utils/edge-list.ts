@@ -1,4 +1,4 @@
-import type { GraphListItem } from "@/components/GraphSelectionForm";
+import type { GraphListItem } from "@/types/graph";
 
 export default function parseEdgeList(
   edgeList: string,
