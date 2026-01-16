@@ -270,7 +270,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
         <ContextMenuSeparator />
         <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
         <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>
-        <ContextMenuItem disabled>Show Domineering Sets</ContextMenuItem>
+        <ContextMenuItem disabled>Show Dominating Sets</ContextMenuItem>
         <ContextMenuItem disabled>Show Independent Sets</ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
