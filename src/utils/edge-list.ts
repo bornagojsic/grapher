@@ -1,4 +1,5 @@
 import type { GraphListItem } from "@/types/graph";
+import { generateUUID } from "./uuid";
 
 export default function parseEdgeList(
   edgeList: string,
@@ -28,7 +29,7 @@ export default function parseEdgeList(
   });
 
   return {
-    id: crypto.randomUUID(),
+    id: generateUUID(),
     name: "Edge Graph",
     description: `Graph with edges: ${edgeList}`,
     active: false,

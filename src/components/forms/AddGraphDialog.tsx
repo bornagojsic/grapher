@@ -12,6 +12,7 @@ import BananaTreeCreationForm from "./BananaTreeCreationForm";
 import type { BananaTreeCreationProps } from "./BananaTreeCreationForm";
 import EdgeListCreationForm from "./EdgeListCreationForm";
 import AdjacencyMatrixCreationForm from "./AdjacencyMatrixCreationForm";
+import { useEffect, useState } from "react";
 
 export default function AddGraphDialog({
   addGraph,
@@ -20,6 +21,16 @@ export default function AddGraphDialog({
   addGraph: (graph: GraphListItem) => void;
   defaultValues?: BananaTreeCreationProps;
 }) {
+  const [isSmall, setIsSmall] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth < 450) {
+      setIsSmall(true);
+    } else {
+      setIsSmall(false);
+    }
+  }, []);
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -30,14 +41,16 @@ export default function AddGraphDialog({
           <DialogTitle>Add a new graph</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="banana-tree" className="flex flex-col">
-          <TabsList style={{ padding: "0" }}>
-            <TabsTrigger value="banana-tree">Banana tree</TabsTrigger>
-            <TabsTrigger value="edge-list">From edge list</TabsTrigger>
-            <TabsTrigger value="adjacency-matrix">
-              From adjacency matrix
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="banana-tree">
+          <div className="flex flex-row justify-center">
+            <TabsList className="p-0 flex flex-col h-fit !bg-transparent">
+              <TabsTrigger value="banana-tree">Banana tree</TabsTrigger>
+              <TabsTrigger value="edge-list">From edge list</TabsTrigger>
+              <TabsTrigger value="adjacency-matrix">
+                From adjacency matrix
+              </TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value="banana-tree" className="p-2 min-h-[250px]">
             <h2 className="text-lg font-semibold mb-4">
               Select B(n, k) parameters
@@ -47,7 +60,10 @@ export default function AddGraphDialog({
               addGraph={addGraph}
             />
           </TabsContent>
-          <TabsContent value="edge-list" className="p-2 min-h-[250px]">
+          <TabsContent
+            value="edge-list"
+            className={`${isSmall ? "" : "p-2"} min-h-[250px]`}
+          >
             <h2 className="text-lg font-semibold mb-4">
               Create a new graph from edge list
             </h2>
