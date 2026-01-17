@@ -1,10 +1,11 @@
+import type { GraphListItem } from "@/types/graph";
 import ListSelectionItem from "./ListSelectionItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface ListSelectionProps {
-  list: Array<any>;
-  onSelect: (graph: any) => void;
-  onDelete: (graph: any) => void;
+interface ListSelectionProps<T> {
+  list: Array<T>;
+  onSelect: (graph: T) => void;
+  onDelete: (graph: T) => void;
   emptyMessage?: React.ReactNode;
 }
 
@@ -13,7 +14,7 @@ export default function ListSelection({
   onSelect,
   onDelete,
   emptyMessage,
-}: ListSelectionProps) {
+}: ListSelectionProps<GraphListItem>) {
   if (!list || !Array.isArray(list) || list.length === 0) {
     return emptyMessage;
   }

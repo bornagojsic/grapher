@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/context-menu";
 import NodeEditForm from "@/components/forms/NodeEditForm";
 import { useTheme } from "@/components/theme/theme-provider";
-import type { GraphNode } from "@/types/graph";
+import type { GraphLink, GraphNode } from "@/types/graph";
 
 interface ForceGraphProps {
   nodes: GraphNode[];
@@ -28,6 +28,22 @@ interface ForceGraphProps {
   onDeleteNode: (id: string) => void;
   onSaveGraph: () => void;
 }
+
+// Helper function to calculate distance between two points
+const getDistance = (
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+) => {
+  return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+};
+
+// Helper function to calculate center point between two points
+const getMidpoint = (
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+) => {
+  return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+};
 
 const ForceGraph: React.FC<ForceGraphProps> = ({
   nodes,
@@ -47,9 +63,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
   const defaultColor = theme.theme === "light" ? "#2B7FFF" : "#155DFC";
 
   const [currentNodes, setNodes] = useState<GraphNode[]>(nodes);
-  const [currentLinks, setLinks] = useState<
-    Array<{ source: string; target: string; [key: string]: string }>
-  >(links);
+  const [currentLinks, setLinks] = useState<GraphLink[]>(links);
 
   useEffect(() => {
     setNodes(nodes);
@@ -63,7 +77,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
     const simulationNodes = currentNodes.map((n) => ({ ...n }));
     const simulationLinks = currentLinks.map((l) => ({ ...l }));
 
-    const showContextMenu = (event: MouseEvent, d: GraphNode) => {
+    const showContextMenu = (event: MouseEvent | TouchEvent, d: GraphNode) => {
       event.preventDefault();
       setContextNode(d);
       setDialogOpen(true);
@@ -112,6 +126,33 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .call(drag(simulation) as any) // eslint-disable-line @typescript-eslint/no-explicit-any
       .on("contextmenu", function (event: MouseEvent, d: GraphNode) {
         showContextMenu(event, d);
+      })
+      // Add touch event for context menu on mobile
+      .on("touchstart", function (event: TouchEvent, d: GraphNode) {
+        // Prevent default to avoid scrolling
+        event.preventDefault();
+
+        // Store the start time for long press detection
+        const startTime = Date.now();
+        //const touches = event.touches;
+
+        // Handle touch end to detect long press
+        const handleTouchEnd = () => {
+          const endTime = Date.now();
+
+          // If touch lasted more than 500ms, treat as long press
+          if (endTime - startTime > 500) {
+            showContextMenu(event, d);
+          }
+
+          // Remove event listeners
+          window.removeEventListener("touchend", handleTouchEnd);
+          window.removeEventListener("touchcancel", handleTouchEnd);
+        };
+
+        // Add event listeners
+        window.addEventListener("touchend", handleTouchEnd);
+        window.addEventListener("touchcancel", handleTouchEnd);
       });
 
     g.append("g")
@@ -154,18 +195,83 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
         .attr("y", (d) => (d as GraphNode).y! - 25);
     });
 
-    // Only pan when dragging the background (not on nodes)
+    // Enhanced zoom behavior with touch support
     if (svgRef.current) {
-      d3.select(svgRef.current).call(
-        d3
-          .zoom<SVGSVGElement, unknown>()
-          .filter((event) => {
-            return event.button === 0 && event.target === svgRef.current;
-          })
-          .on("zoom", (event) => {
-            g.attr("transform", event.transform);
-          }),
-      );
+      let lastTouchDistance: number | null = null;
+      let initialPinchCenter: { x: number; y: number } | null = null;
+
+      const zoomBehavior = d3
+        .zoom<SVGSVGElement, unknown>()
+        .filter((event) => {
+          // Allow touch events and mouse events on background
+          if ("touches" in event) {
+            // For touch events, only allow if it's on the background (not on nodes)
+            return (event.target as Element).tagName === "svg";
+          }
+          // For mouse events, only allow left click on background
+          return event.button === 0 && event.target === svgRef.current;
+        })
+        .on("zoom", (event) => {
+          g.attr("transform", event.transform);
+        });
+
+      d3.select(svgRef.current).call(zoomBehavior);
+
+      // Add custom touch event handling for pinch zoom
+      svg.on("touchstart", (event: TouchEvent) => {
+        if (event.touches.length === 2) {
+          event.preventDefault(); // Prevent default browser zoom
+          lastTouchDistance = getDistance(
+            { x: event.touches[0].clientX, y: event.touches[0].clientY },
+            { x: event.touches[1].clientX, y: event.touches[1].clientY },
+          );
+
+          // Calculate initial pinch center
+          initialPinchCenter = getMidpoint(
+            { x: event.touches[0].clientX, y: event.touches[0].clientY },
+            { x: event.touches[1].clientX, y: event.touches[1].clientY },
+          );
+        }
+      });
+
+      svg.on("touchmove", (event: TouchEvent) => {
+        if (
+          event.touches.length === 2 &&
+          lastTouchDistance &&
+          initialPinchCenter
+        ) {
+          event.preventDefault(); // Prevent default browser zoom
+
+          const currentTouchDistance = getDistance(
+            { x: event.touches[0].clientX, y: event.touches[0].clientY },
+            { x: event.touches[1].clientX, y: event.touches[1].clientY },
+          );
+
+          const scaleDiff = currentTouchDistance / lastTouchDistance;
+
+          // Get current transform
+          const transform = d3.zoomTransform(svg.node() as SVGSVGElement);
+
+          // Calculate new transform with scaling at pinch center
+          const newTransform = transform
+            .translate(initialPinchCenter.x, initialPinchCenter.y)
+            .scale(scaleDiff)
+            .translate(-initialPinchCenter.x, -initialPinchCenter.y);
+
+          // Apply the new transform
+          d3.select(svgRef.current!).call(zoomBehavior.transform, newTransform);
+
+          lastTouchDistance = currentTouchDistance;
+        }
+      });
+
+      // Reset touch variables on touch end
+      svg.on("touchend", (event: TouchEvent) => {
+        if (event.touches.length < 2) {
+          lastTouchDistance = null;
+          initialPinchCenter = null;
+        }
+      });
     }
 
     function drag(simulation: d3.Simulation<GraphNode, undefined>) {
@@ -214,7 +320,13 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
           style={{ cursor: "move" }}
         />
         {contextNode && (
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Dialog
+            open={dialogOpen}
+            onOpenChange={() => {
+              setDialogOpen(false);
+              setContextNode(null);
+            }}
+          >
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Node Settings</DialogTitle>
@@ -241,16 +353,18 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
           </Dialog>
         )}
       </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem onClick={() => onSaveGraph()}>
-          Download Graph
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
-        <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>
-        <ContextMenuItem disabled>Show Dominating Sets</ContextMenuItem>
-        <ContextMenuItem disabled>Show Independent Sets</ContextMenuItem>
-      </ContextMenuContent>
+      {!contextNode && (
+        <ContextMenuContent>
+          <ContextMenuItem onClick={() => onSaveGraph()}>
+            Download Graph
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
+          <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>
+          <ContextMenuItem disabled>Show Dominating Sets</ContextMenuItem>
+          <ContextMenuItem disabled>Show Independent Sets</ContextMenuItem>
+        </ContextMenuContent>
+      )}
     </ContextMenu>
   );
 };

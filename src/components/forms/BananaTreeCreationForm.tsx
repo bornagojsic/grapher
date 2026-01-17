@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import type { GraphListItem } from "@/types/graph";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme/theme-provider";
+import { generateUUID } from "@/utils/uuid";
 
 const formSchema = z.object({
   name: z
@@ -76,7 +77,7 @@ export default function BananaTreeCreationForm({
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     addGraph?.({
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       name: values.name,
       description: `Banana tree with n = ${values.n} and k = ${values.k}.`,
       active: false,

@@ -11,6 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Upload } from "lucide-react";
+import { generateUUID } from "@/utils/uuid";
 
 interface UploadGraphDialogProps {
   addGraph: (graph: GraphListItem) => void;
@@ -93,7 +94,7 @@ export default function UploadGraphDialog({
       }
 
       // Generate a new unique ID to avoid conflicts
-      let newId = crypto.randomUUID();
+      let newId = generateUUID();
       while (existingGraphIds.includes(newId)) {
         newId = crypto.randomUUID();
       }
@@ -187,9 +188,10 @@ export default function UploadGraphDialog({
               min-h-[200px] w-full
               border-2 border-dashed rounded-lg
               transition-colors cursor-pointer
-              ${isDragging
-                ? "border-primary bg-primary/5"
-                : "border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-accent/50"
+              ${
+                isDragging
+                  ? "border-primary bg-primary/5"
+                  : "border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-accent/50"
               }
             `}
             onClick={() => fileInputRef.current?.click()}

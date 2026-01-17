@@ -44,6 +44,8 @@ body {
     place-items: center;
     min-width: 320px;
     min-height: 100vh;
+    /* Prevent overscroll behavior on mobile */
+    overscroll-behavior: none;
 }
 
 h1 {
@@ -238,4 +240,52 @@ div[role="tabslist"] {
 
 .space-mono {
     font-family: "Space Mono", monospace;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    #root {
+        margin: 0;
+        padding: 0.5rem;
+        width: 100%;
+        height: 100vh;
+    }
+
+    /* Ensure proper spacing for mobile */
+    .main-panel {
+        height: calc(100vh - 60px) !important; /* Adjust for mobile header */
+    }
+
+    /* Adjust scroll areas for mobile */
+    [data-radix-scroll-area-viewport] {
+        height: 100%;
+    }
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+    .main-panel {
+        height: calc(100vh - 175px) !important;
+    }
+}
+
+/* Prevent default touch behaviors that interfere with graph interaction */
+.touch-action-none {
+    touch-action: none;
+}
+
+/* Improve touch experience */
+svg.force-graph {
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
