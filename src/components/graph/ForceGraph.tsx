@@ -8,16 +8,13 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-  ContextMenuSeparator,
-} from "@/components/ui/context-menu";
 import NodeEditForm from "@/components/forms/NodeEditForm";
 import { useTheme } from "@/components/theme/theme-provider";
 import type { GraphLink, GraphNode } from "@/types/graph";
+import GraphOptionsMenu from "./GraphOptionsMenu";
+import "@/services/colorGraphOperation"; // Import to register the operation
+import "@/services/crossingNumberOperation"; // Import to register the operation
+import { getTextColorForBackground } from "@/utils/textColor";
 
 interface ForceGraphProps {
   nodes: GraphNode[];
@@ -167,6 +164,7 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
       .append("xhtml:div")
       .style("font-size", "14px")
       .style("text-align", "center")
+      .style("color", (d) => getTextColorForBackground(d.color || defaultColor))
       .each(function (d) {
         try {
           katex.render(d.label, this as HTMLElement, {
@@ -310,8 +308,21 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
   }, [currentNodes, currentLinks, width, height, defaultColor]);
 
   return (
-    <ContextMenu>
-      <ContextMenuTrigger className="w-full h-full">
+    <GraphOptionsMenu
+      graph={{
+        id: "current-graph",
+        name: "Current Graph",
+        nodes: currentNodes,
+        links: currentLinks,
+        active: true,
+      }}
+      onGraphUpdate={(updatedGraph) => {
+        setNodes(updatedGraph.nodes);
+        setLinks(updatedGraph.links);
+      }}
+      onDownloadGraph={onSaveGraph}
+    >
+      <div className="w-full h-full relative">
         <svg
           ref={svgRef}
           width={width}
@@ -352,20 +363,8 @@ const ForceGraph: React.FC<ForceGraphProps> = ({
             </DialogContent>
           </Dialog>
         )}
-      </ContextMenuTrigger>
-      {!contextNode && (
-        <ContextMenuContent>
-          <ContextMenuItem onClick={() => onSaveGraph()}>
-            Download Graph
-          </ContextMenuItem>
-          <ContextMenuSeparator />
-          <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
-          <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>
-          <ContextMenuItem disabled>Show Dominating Sets</ContextMenuItem>
-          <ContextMenuItem disabled>Show Independent Sets</ContextMenuItem>
-        </ContextMenuContent>
-      )}
-    </ContextMenu>
+      </div>
+    </GraphOptionsMenu>
   );
 };
 

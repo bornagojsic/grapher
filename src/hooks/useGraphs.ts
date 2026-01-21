@@ -19,7 +19,10 @@ interface UseGraphsReturn {
   addGraph: (graph: GraphListItem) => void;
   removeGraph: (graph: GraphListItem) => void;
   updateActiveGraph: (updater: (graph: GraphListItem) => GraphListItem) => void;
-  updateNodeInActiveGraph: (nodeId: string, updates: Partial<GraphNode>) => void;
+  updateNodeInActiveGraph: (
+    nodeId: string,
+    updates: Partial<GraphNode>,
+  ) => void;
   removeNodeFromActiveGraph: (nodeId: string) => void;
   saveActiveGraph: () => void;
 }
@@ -67,20 +70,21 @@ export function useGraphs({ defaultColor }: UseGraphsOptions): UseGraphsReturn {
       return activeGraph;
     }
 
-    return graphs[0] || {
-      id: "empty-graph",
-      name: "No Graph Selected",
-      description: "Please add a graph.",
-      active: false,
-      nodes: [],
-      links: [],
-    };
+    return (
+      graphs[0] || {
+        id: "empty-graph",
+        name: "No Graph Selected",
+        description: "Please add a graph.",
+        active: false,
+        nodes: [],
+        links: [],
+      }
+    );
   }, [getDefaultGraphsList]);
 
   const [activeGraph, setActiveGraph] = useState<GraphListItem>(() =>
     getDefaultActiveGraph(),
   );
-
 
   const updateActiveGraph = useCallback(
     (updater: (graph: GraphListItem) => GraphListItem) => {
@@ -119,6 +123,7 @@ export function useGraphs({ defaultColor }: UseGraphsOptions): UseGraphsReturn {
         links: graph.links.filter(
           (l) => l.source !== nodeId && l.target !== nodeId,
         ),
+        crossingNumber: undefined,
       }));
     },
     [updateActiveGraph],
@@ -149,20 +154,17 @@ export function useGraphs({ defaultColor }: UseGraphsOptions): UseGraphsReturn {
     saveGraph(activeGraph);
   }, [activeGraph, saveGraph]);
 
-  const selectGraph = useCallback(
-    (graph: GraphListItem) => {
-      setGraphsList((prev) =>
-        prev.map((g) => ({
-          ...g,
-          active: g.id === graph.id,
-        })),
-      );
+  const selectGraph = useCallback((graph: GraphListItem) => {
+    setGraphsList((prev) =>
+      prev.map((g) => ({
+        ...g,
+        active: g.id === graph.id,
+      })),
+    );
 
-      setActiveGraph({ ...graph, active: true });
-      saveActiveGraphIdToStorage(graph.id);
-    },
-    [],
-  );
+    setActiveGraph({ ...graph, active: true });
+    saveActiveGraphIdToStorage(graph.id);
+  }, []);
 
   const removeGraph = useCallback(
     (graph: GraphListItem) => {

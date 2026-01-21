@@ -43,10 +43,16 @@ export default function AddGraphDialog({
 
         <Tabs defaultValue="banana-tree">
           <div className="flex flex-row justify-center">
-            <TabsList className="p-0 flex flex-col h-fit !bg-transparent">
-              <TabsTrigger value="banana-tree">Banana tree</TabsTrigger>
-              <TabsTrigger value="edge-list">From edge list</TabsTrigger>
-              <TabsTrigger value="adjacency-matrix">
+            <TabsList
+              className={`p-0 flex ${isSmall ? "flex-col" : "flex-row"} h-fit`}
+            >
+              <TabsTrigger value="banana-tree" className="w-full">
+                Banana tree
+              </TabsTrigger>
+              <TabsTrigger value="edge-list" className="w-full">
+                From edge list
+              </TabsTrigger>
+              <TabsTrigger value="adjacency-matrix" className="w-full">
                 From adjacency matrix
               </TabsTrigger>
             </TabsList>

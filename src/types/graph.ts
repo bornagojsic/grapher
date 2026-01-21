@@ -21,4 +21,5 @@ export type GraphListItem = {
   nodes: Array<GraphNode>;
   links: Array<GraphLink>;
   active: boolean;
+  crossingNumber?: number;
 };
