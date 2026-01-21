@@ -81,6 +81,7 @@ export function ResizableGraphInterface() {
             addGraph={addGraph}
             removeGraph={removeGraph}
             isMobile={isMobile}
+            activeGraph={activeGraph}
           />
         </div>
       </ResizablePanel>
