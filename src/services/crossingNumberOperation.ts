@@ -42,10 +42,15 @@ export const crossingNumberOperation = {
     if (graph.crossingNumber !== undefined && graph.crossingNumber !== null) {
       console.log("Crossing Number:", graph.crossingNumber);
     } else {
-      const PORT = 7271;
-      const HOST = "localhost";
-      const PATH = "/crossing-num";
-      const URL = `http://${HOST}:${PORT}${PATH}`;
+      // local url
+
+      // const PORT = 7271;
+      // const HOST = "localhost";
+      // const PATH = "/crossing-num";
+      // const URL = `http://${HOST}:${PORT}${PATH}`;
+
+      // prod URL
+      const URL = "https://grapher-api.bornagojsic.dev/crossing-num";
 
       const adjacencyLists = getGraphAdjacencyLists(graph);
       const json = JSON.stringify(Object.fromEntries(adjacencyLists));
