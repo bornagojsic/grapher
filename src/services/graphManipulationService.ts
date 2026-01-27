@@ -21,6 +21,7 @@ export class OperationRegistry implements GraphManipulationService {
   async executeOperation(
     id: string,
     graph: GraphListItem,
+    theme: string,
     params?: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   ): Promise<void> {
     const operation = this.operations.get(id);
@@ -34,7 +35,7 @@ export class OperationRegistry implements GraphManipulationService {
       );
     }
 
-    await operation.execute(graph, params);
+    await operation.execute(graph, theme, params);
   }
 
   getAvailableOperations(): GraphOperation[] {

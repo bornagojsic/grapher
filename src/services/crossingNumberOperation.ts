@@ -1,72 +1,31 @@
 import type { GraphListItem } from "@/types/graph";
 import { graphManipulationService } from "./graphManipulationService";
-
-function getGraphAdjacencyLists(graph: GraphListItem): Map<number, number[]> {
-  const adjacencyLists = new Map<number, number[]>();
-
-  const nodes = graph.nodes.map((node) => node.id);
-
-  const nodeToIntMap = new Map<string, number>();
-  for (let i = 0; i < nodes.length; i++) {
-    nodeToIntMap.set(nodes[i], i);
-  }
-
-  graph.links.forEach((edge) => {
-    const { source, target } = edge;
-    const sourceIndex = nodeToIntMap.get(source);
-    const targetIndex = nodeToIntMap.get(target);
-    if (sourceIndex === undefined || targetIndex === undefined) {
-      throw new Error(`Node not found: ${source} or ${target}`);
-    }
-    if (!adjacencyLists.has(sourceIndex)) {
-      adjacencyLists.set(sourceIndex, []);
-    }
-    if (!adjacencyLists.has(targetIndex)) {
-      adjacencyLists.set(targetIndex, []);
-    }
-    adjacencyLists.get(sourceIndex)!.push(targetIndex);
-    adjacencyLists.get(targetIndex)!.push(sourceIndex);
-  });
-
-  return adjacencyLists;
-}
+import { fetchGraphService } from "@/utils/fetch-graph-service";
 
 export const crossingNumberOperation = {
   id: "crossing-number",
   name: "Crossing Number",
   description: "Calculate the crossing number of the graph",
   icon: "❎",
-  async execute(graph: GraphListItem): Promise<void> {
+  async execute(graph: GraphListItem, theme: string): Promise<void> {
     console.log("Current crossing number:", graph.crossingNumber);
+
+    console.log("Current color:", theme);
 
     if (graph.crossingNumber !== undefined && graph.crossingNumber !== null) {
       console.log("Crossing Number:", graph.crossingNumber);
     } else {
-      // local url
+      // local URL
 
       // const PORT = 7271;
       // const HOST = "localhost";
       // const PATH = "/crossing-num";
-      // const URL = `http://${HOST}:${PORT}${PATH}`;
+      // const url = `http://${HOST}:${PORT}${PATH}`;
 
       // prod URL
-      const URL = "https://grapher-api.bornagojsic.dev/crossing-num";
 
-      const adjacencyLists = getGraphAdjacencyLists(graph);
-      const json = JSON.stringify(Object.fromEntries(adjacencyLists));
-      const fullJson = `{ "graph": ${json} }`;
-
-      console.log("Full JSON:", fullJson);
-
-      const req = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: fullJson,
-      };
-
-      const response = await fetch(URL, req);
+      const url = "https://grapher-api.bornagojsic.dev/crossing-num";
+      const response = await fetchGraphService({ graph, url });
 
       if (!response.ok) {
         throw new Error(`Failed to calculate the crossing number`);
