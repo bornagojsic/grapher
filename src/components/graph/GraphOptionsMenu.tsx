@@ -9,6 +9,7 @@ import {
 import type { GraphListItem } from "@/types/graph";
 import { graphManipulationService } from "@/services/graphManipulationService";
 import type { GraphOperation } from "@/types/service";
+import { useTheme } from "../theme/theme-provider";
 
 interface GraphOptionsMenuProps {
   children: React.ReactNode;
@@ -27,6 +28,8 @@ const GraphOptionsMenu: React.FC<GraphOptionsMenuProps> = ({
     GraphOperation[]
   >([]);
 
+  const theme = useTheme();
+
   useEffect(() => {
     // Get available operations from the service
     const operations = graphManipulationService.getAvailableOperations();
@@ -40,7 +43,11 @@ const GraphOptionsMenu: React.FC<GraphOptionsMenuProps> = ({
       const graphClone = JSON.parse(JSON.stringify(graph));
 
       // Execute the operation
-      await graphManipulationService.executeOperation(operationId, graphClone);
+      await graphManipulationService.executeOperation(
+        operationId,
+        graphClone,
+        theme.theme,
+      );
 
       // Update the graph in the parent component
       if (onGraphUpdate) {
@@ -88,8 +95,6 @@ const GraphOptionsMenu: React.FC<GraphOptionsMenuProps> = ({
         ))}
         {availableOperations.length > 0 && <ContextMenuSeparator />}
 
-        <ContextMenuItem disabled>Calculate crossing number</ContextMenuItem>
-        <ContextMenuItem disabled>Show Proper Node Coloring</ContextMenuItem>
         <ContextMenuItem disabled>Show Dominating Sets</ContextMenuItem>
         <ContextMenuItem disabled>Show Independent Sets</ContextMenuItem>
       </ContextMenuContent>
