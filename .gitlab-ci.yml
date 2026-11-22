@@ -41,6 +41,12 @@ deploy_to_server:
           ports:
             - "$DEPLOY_PORT:$DEPLOY_PORT"
           restart: unless-stopped
+          mem_limit: 256m
+          healthcheck:
+            test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:6947/"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
       networks: {}
       EOF
 
