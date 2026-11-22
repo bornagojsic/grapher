@@ -1,0 +1,15 @@
+# Deployed to mars by .gitlab-ci.yml (bornagojsic/ci-templates .deploy-compose).
+services:
+  grapher:
+    build: ..
+    labels:
+      - diun.enable=false  # locally built, no registry to check
+    ports:
+      - "127.0.0.1:6947:6947"
+    restart: unless-stopped
+    mem_limit: 256m
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:6947/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

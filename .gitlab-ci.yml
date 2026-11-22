@@ -1,58 +1,10 @@
-# .gitlab-ci.yml
+# Deploy job: bornagojsic/ci-templates deploy-compose.yml; stack definition in deploy/compose.yaml.
+include:
+  - project: bornagojsic/ci-templates
+    file: deploy-compose.yml
+
 stages:
   - deploy
 
 deploy_to_server:
-  tags:
-    - shell
-  stage: deploy
-  only:
-    - main
-  variables:
-    PROJECT_NAME: $CI_PROJECT_NAME  # GitLab auto-provides this
-    STACK_DIR: "/opt/stacks/$CI_PROJECT_NAME"
-    SERVICE_DIR: "/home/server/active-services/$CI_PROJECT_NAME"
-    DOCKER_HOST: unix:///var/run/docker.sock
-  before_script:
-    - echo "DOCKER_HOST=$DOCKER_HOST"
-    - |
-      if [ -d "$STACK_DIR" ]; then
-        cd "$STACK_DIR" && docker compose down
-      fi
-    - mkdir -p "$STACK_DIR" "$SERVICE_DIR"
-    - git config --global --add safe.directory "$SERVICE_DIR"
-  script:
-    # Clone or update the repo in active-services
-    - |
-      if [ -d "$SERVICE_DIR/.git" ]; then
-        rm -rf "$SERVICE_DIR"
-      fi && git clone --branch main git@ssh.gitlab.bornagojsic.dev:bornagojsic/$CI_PROJECT_NAME.git "$SERVICE_DIR"
-
-    # Generate docker-compose.yml
-    - |
-      cat > "$STACK_DIR/docker-compose.yml" <<EOF
-      services:
-        $CI_PROJECT_NAME:
-          build:
-            context: $SERVICE_DIR
-            dockerfile: Dockerfile
-          labels:
-            - diun.enable=false  # locally built, no registry to check
-          ports:
-            - "$DEPLOY_PORT:$DEPLOY_PORT"
-          restart: unless-stopped
-          mem_limit: 256m
-          healthcheck:
-            test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:6947/"]
-            interval: 30s
-            timeout: 5s
-            retries: 3
-      networks: {}
-      EOF
-
-    # Deploy (build + run in background)
-    - cd "$STACK_DIR" && docker compose up -d --build
-
-  # Optional: cleanup dangling images
-  after_script:
-    - docker image prune -f
+  extends: .deploy-compose
