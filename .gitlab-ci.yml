@@ -36,6 +36,8 @@ deploy_to_server:
           build:
             context: $SERVICE_DIR
             dockerfile: Dockerfile
+          labels:
+            - diun.enable=false  # locally built, no registry to check
           ports:
             - "$DEPLOY_PORT:$DEPLOY_PORT"
           restart: unless-stopped
