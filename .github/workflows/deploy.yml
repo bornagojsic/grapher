@@ -1,0 +1,13 @@
+# Deploy job: bornagojsic/ci-templates deploy-compose.yml; stack definition in deploy/compose.yaml.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    uses: bornagojsic/ci-templates/.github/workflows/deploy-compose.yml@main
+    secrets:
+      DEPLOY_ENV: ${{ secrets.DEPLOY_ENV }}
