@@ -1,4 +1,4 @@
-# Deploy job: bornagojsic/ci-templates deploy-compose.yml; stack definition in deploy/compose.yaml.
+# Deploy job: bornagojsic/ci-templates deploy-pages.yml (Cloudflare Pages project `grapher`).
 name: deploy
 
 on:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   deploy:
-    uses: bornagojsic/ci-templates/.github/workflows/deploy-compose.yml@main
+    uses: bornagojsic/ci-templates/.github/workflows/deploy-pages.yml@main
     secrets:
-      DEPLOY_ENV: ${{ secrets.DEPLOY_ENV }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
